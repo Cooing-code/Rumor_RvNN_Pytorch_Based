@@ -1,40 +1,64 @@
-# Paper of the source codes released:
+# 基于树结构递归神经网络（RvNN）的谣言检测模型
 
-Jing Ma, Wei Gao, Kam-Fai Wong. Rumor Detection on Twitter with Tree-structured Recursive Neural Networks. In Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics, ACL 2018.
+本项目是基于树结构递归神经网络（RvNN）的谣言检测方法的PyTorch实现。该模型利用社交媒体上谣言传播的树状结构特征，通过自底向上（BU-RvNN）和自顶向下（TD-RvNN）两种递归神经网络结构来捕捉谣言传播模式。
 
-# Datasets:
+## 模型结构
 
-The datasets used in the experiments were based on the two publicly available Twitter datasets released by Ma et al. (2017):
+该模型包含以下主要组件：
 
-Jing Ma, Wei Gao, Kam-Fai Wong. Detect Rumors in Microblog Posts Using Propagation Structure via Kernel Learning. ACL 2017.
+1. **自底向上RvNN (BU-RvNN)**：从叶节点到根节点递归聚合信息，捕捉局部特征形成全局表示。
+2. **自顶向下RvNN (TD-RvNN)**：从根节点到叶节点传递信息，强化节点特征。
+3. **GAN架构**：包含两个生成器和一个判别器，通过对抗训练提高模型性能。
 
-In the 'resource' folder we provide the pre-processed data files used for our experiments. The raw datasets can be downloaded from https://www.dropbox.com/s/7ewzdrbelpmrnxu/rumdetect2017.zip?dl=0. For details about the datasets please contact Jing at: majing at se dot cuhk dot edu dot hk.
+## 文件结构
 
-The datafile is in a tab-sepreted column format, where each row corresponds to a tweet. Consecutive columns correspond to the following pieces of information:
+```
+RumorRvNN/
+├── data/               # 数据处理相关代码
+├── models/             # 模型定义
+│   ├── bu_rvnn.py      # 自底向上RvNN模型
+│   ├── td_rvnn.py      # 自顶向下RvNN模型
+│   ├── gan_model.py    # GAN模型
+│   └── base_model.py   # 基础模型类
+├── utils/              # 工具函数
+│   ├── data_utils.py   # 数据处理工具
+│   └── eval_utils.py   # 评估工具
+├── train/              # 训练相关代码
+│   ├── train_rvnn.py   # RvNN模型训练
+│   └── train_gan.py    # GAN模型训练
+└── main.py             # 主程序入口
+```
 
-1: root-id -- an unique identifier describing the tree (tweetid of the root);
+## 使用方法
 
-2: index-of-parent-tweet -- an index number of the parent tweet for the current tweet;
+### 环境要求
 
-3: index-of-the-current-tweet -- an index number of the current tweet;
+- Python 3.6+
+- PyTorch 1.7+
+- NumPy
+- scikit-learn
 
-4: parent-number -- the total number of the parent node in the tree that the current tweet is belong to;
+### 训练模型
 
-5: text-length -- the maximum length of all the texts from the tree that the current tweet is belong to;
+```bash
+python main.py --mode train --model bu_rvnn --data_path path/to/data
+```
 
-6: list-of-index-and-counts -- the rest of the line contains space separated index-count pairs, where a index-count pair is in format of "index:count", E.g., "index1:count1 index2:count2" (extracted from the "text" field in the json format from Twitter)
+### 评估模型
 
+```bash
+python main.py --mode test --model td_rvnn --checkpoint path/to/checkpoint
+```
 
-# Dependencies:
-Please install the following python libraries:
+## 引用
 
-numpy version 1.11.2
+如果您使用了本代码，请引用原论文：
 
-theano version 0.8.2
-
-# Reproduce the experimental results
-Run script "model/Main_BU_RvNN.py" for bottom-up recursive model or "model/Main_TD_RvNN.py" for up-down recursive model.
-
-Alternatively, you can change the "obj" parameter and "fold" parameter to set the dataset and each fold.
-
-#If you find this code useful, please let us know and cite our paper.
+```
+@article{ma2018rumor,
+  title={Rumor Detection on Twitter with Tree-structured Recursive Neural Networks},
+  author={Ma, Jing and Gao, Wei and Wong, Kam-Fai},
+  journal={Association for Computational Linguistics},
+  year={2018}
+}
+``` 
